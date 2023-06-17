@@ -13,6 +13,8 @@ struct investidor {
     char* nome;
     dn data;
     char cpf[12];
+    char* endereco;
+    float salario;    
     float patrimonio;
 };
 typedef struct investidor investidor;
@@ -28,5 +30,7 @@ void alterar();
 void remover();
 //Função para verificar se há IDs repetidos
 int verificar_id(int n);
+//Função para verificar se há CPFs repetidos
+int verificar_cpf(char* n);
 //Função menu
 void opcao();
