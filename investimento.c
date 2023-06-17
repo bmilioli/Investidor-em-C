@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "investimento.h"
+#include "investidor.h"
 
 #define MAX_INVESTIMENTOS 10
 investimento list[MAX_INVESTIMENTOS];
@@ -16,9 +16,9 @@ int verifica_codigo(int n) {
   return 1; // ID válido
 }
 
-investimento criar_investimento(int codigo, int codigoInvestidor, char tipo[20],
-                                char *descricao, int prazoDiasUteis,
-                                float rentabilidadeAnual) {
+
+
+investimento criar_investimento(int codigo, int codigoInvestidor, char tipo[20], float valor, char *descricao, int prazoDiasUteis,di dataIvestimento ,float rentabilidadeAnual, float valorizacao) {
   investimento invest;
   invest.codigo = codigo;
   invest.codigoInvestidor = codigoInvestidor;
@@ -46,13 +46,15 @@ void inserirInvestimento() {
       return;
     }
     // Verificar se o código já existe na lista de investimentos
-
     printf("Digite o código do investidor associado:\n");
     scanf("%d", &list[num_investimentos].codigoInvestidor);
-
+    
     printf("Digite o tipo do investimento:\n");
     scanf("%s", list[num_investimentos].tipo);
 
+    printf("Digite o valor do investimento:\n");
+    scanf("%f", &list[num_investimentos].valor);
+    
     printf("Digite a descrição do investimento:\n");
     char descricao[100];
     getchar();
@@ -65,15 +67,25 @@ void inserirInvestimento() {
     printf("Digite o prazo em dias úteis:\n");
     scanf("%d", &list[num_investimentos].prazoDiasUteis);
 
-    printf("Digite a rentabilidade anual:\n");
+    printf("Digite a data do investimento:\n");
+    printf("Dia:\n");
+    scanf("%d", &list[num_investimentos].dataInvestimento.dia);
+    printf("Mês:\n");
+    scanf("%d", &list[num_investimentos].dataInvestimento.mes);
+    printf("Ano:\n");
+    scanf("%d", &list[num_investimentos].dataInvestimento.ano);
+    
+    printf("Digite a rentabilidade anual (em %%):\n");
     scanf("%f", &list[num_investimentos].rentabilidadeAnual);
 
-    criar_investimento(list[num_investimentos].codigo,
+    list[num_investimentos].valorizacao = list[num_investimentos].valor * ((list[num_investimentos].rentabilidadeAnual/100)* list[num_investimentos].prazoDiasUteis/365);
+
+   /*  criar_investimento(list[num_investimentos].codigo,
                        list[num_investimentos].codigoInvestidor,
                        list[num_investimentos].tipo,
                        list[num_investimentos].descricao,
                        list[num_investimentos].prazoDiasUteis,
-                       list[num_investimentos].rentabilidadeAnual);
+                       list[num_investimentos].rentabilidadeAnual); */
 
     num_investimentos++;
     printf("Investimento inserido com sucesso!\n");
@@ -96,9 +108,12 @@ void listarInvestimentos() {
     printf("Código: %d\n", list[i].codigo);
     printf("Código do Investidor: %d\n", list[i].codigoInvestidor);
     printf("Tipo: %s\n", list[i].tipo);
+    printf("Valor: %.2f\n", list[i].valor);
     printf("Descrição: %s\n", list[i].descricao);
+    printf("Data do Investimento: %d/%d/%d\n", list[i].dataInvestimento.dia, list[i].dataInvestimento.mes, list[i].dataInvestimento.ano);
     printf("Prazo (dias úteis): %d\n", list[i].prazoDiasUteis);
     printf("Rentabilidade Anual: %.2f\n", list[i].rentabilidadeAnual);
+    printf("Valorização: %.2f\n", list[i].valorizacao);
     printf("------------------------\n");
   }
 }
@@ -112,7 +127,7 @@ void alterarInvestimento() {
 
   printf("----------------------\nTela de alteração de Investimento:\nEscolha "
          "qual dado você gostaria de alterar:\n----------------------\n");
-  printf("0 - Sair\n1 - Descrição\n2 - Rentabilidade Anual\n");
+  printf("0 - Sair\n1 - Descrição\n2 - Rentabilidade Anual\n3- Valor\n");
   scanf("%d", &escolha);
 
   switch (escolha) {
@@ -121,6 +136,11 @@ void alterarInvestimento() {
     scanf("%d", &codigo);
     scanf("%*[^\n]");
     scanf("%*c");
+    // Verificar se existe um investimento com o código fornecido
+    if (verifica_codigo(codigo) == 1) {
+      printf("Código não encontrado.\n");
+      break;;
+    }  
 
     nova_descricao = malloc(255 * sizeof(char));
     if (nova_descricao == NULL) {
@@ -154,6 +174,12 @@ void alterarInvestimento() {
     printf("Digite o código do investimento:\n");
     scanf("%d", &codigo);
 
+    // Verificar se existe um investimento com o código fornecido
+    if (verifica_codigo(codigo) == 1) {
+      printf("Código não encontrado.\n");
+      break;;
+    }  
+
     printf("Digite a nova rentabilidade anual:\n");
     scanf("%f", &nova_rentabilidade);
 
@@ -161,6 +187,26 @@ void alterarInvestimento() {
       if (list[i].codigo == codigo) {
         list[i].rentabilidadeAnual = nova_rentabilidade;
         printf("Rentabilidade anual alterada com sucesso!\n");
+      }
+    }
+    break;
+  case 3:
+    printf("Digite o código do investimento:\n");
+    scanf("%d", &codigo);
+
+    // Verificar se existe um investimento com o código fornecido
+    if (verifica_codigo(codigo) == 1) {
+      printf("Código não encontrado.\n");
+      break;;
+    }  
+
+    printf("Digite o novo valor:\n");
+    scanf("%f", &nova_rentabilidade);
+
+    for (int i = 0; i < num_investimentos; i++) {
+      if (list[i].codigo == codigo) {
+        list[i].valor = nova_rentabilidade;
+        printf("Valor alterado com sucesso!\n");
       }
     }
     break;
@@ -228,16 +274,27 @@ void listarInvestimento() {
   if (indice == -1) {
     printf("Investimento não encontrado.\n");
   } else {
-    printf("Investimento Nº %d:\n", codigo);
-    printf("----------------------\n");
-    printf("Código: %d\n", list[indice].codigo);
-    printf("Código do Investidor: %d\n", list[indice].codigoInvestidor);
-    printf("Tipo: %s\n", list[indice].tipo);
-    printf("Descrição: %s\n", list[indice].descricao);
-    printf("Prazo em Dias Úteis: %d\n", list[indice].prazoDiasUteis);
-    printf("Rentabilidade Anual: %.2f\n", list[indice].rentabilidadeAnual);
-    printf("----------------------\n----------------------\n");
+     printf("Código: %d\n", list[i].codigo);
+    printf("Código do Investidor: %d\n", list[i].codigoInvestidor);
+    printf("Tipo: %s\n", list[i].tipo);
+    printf("Valor: %.2f\n", list[i].valor);
+    printf("Descrição: %s\n", list[i].descricao);
+    printf("Data do Investimento: %d/%d/%d\n", list[i].dataInvestimento.dia, list[i].dataInvestimento.mes, list[i].dataInvestimento.ano);
+    printf("Prazo (dias úteis): %d\n", list[i].prazoDiasUteis);
+    printf("Rentabilidade Anual: %.2f\n", list[i].rentabilidadeAnual);
+    printf("Valorização: %.2f\n", list[i].valorizacao);
+    printf("------------------------\n");
   }
+}
+
+float somarPatrimonio(int id){
+  float patrimonio = 0;
+  for (int i = 0; i < num_investimentos; i++) {
+    if (list[i].codigoInvestidor == id) {
+      patrimonio += list[i].valorizacao;
+    }
+  }
+  return patrimonio;
 }
 
 void opcao_investimento() {
@@ -245,7 +302,7 @@ void opcao_investimento() {
     int funcao2 = 0;
 
     printf("Escolha uma opção para investimento:\n\n\n");
-    printf("0 - Sair\n1 - Inserir investimento\n2 - Listar Investimento:\n3 - "
+    printf("0 - Voltar\n1 - Inserir investimento\n2 - Listar Investimento:\n3 - "
            "Alterar Investimento\n4 - Remover Investimento\n5 - Listar "
            "Investimento Específico\n");
     scanf("%d", &funcao2);

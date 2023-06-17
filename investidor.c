@@ -113,8 +113,7 @@ void inserir_pessoa() {
         printf("Digite o salário:\n");
         scanf("%f", &lista[num_investidores].salario);
 
-        printf("Digite o patrimônio:\n");
-        scanf("%f", &lista[num_investidores].patrimonio);
+        lista[num_investidores].patrimonio = somarPatrimonio(lista[num_investidores].id);
 
         // Criar o investidor usando a função criar_investidor
         lista[num_investidores] = criar_investidor(lista[num_investidores].id, nome, lista[num_investidores].data, lista[num_investidores].cpf, endereco, lista[num_investidores].salario , lista[num_investidores].patrimonio);
@@ -147,6 +146,7 @@ void listar() {
         printf("CPF: %s\n", lista[i].cpf);
         printf("Endereço: %s\n", lista[i].endereco);
         printf("Salário: R$ %.2f\n", lista[i].salario);
+        lista[i].patrimonio = somarPatrimonio(lista[i].id);
         printf("Patrimônio: R$ %.2f\n", lista[i].patrimonio);
         printf("----------------------\n----------------------\n");
     }
@@ -328,9 +328,50 @@ void listar_investidor() {
         printf("CPF: %s\n", lista[indice].cpf);
         printf("Endereço: %s\n", lista[indice].endereco);
         printf("Salário: R$ %.2f\n", lista[indice].salario);
+        lista[indice].patrimonio = somarPatrimonio(lista[indice].id);
         printf("Patrimônio: R$ %.2f\n", lista[indice].patrimonio);
         printf("----------------------\n----------------------\n");
     }
+}
+
+void listar_ordem_crecente (){
+//listar por ordem crescente de patrimonio
+if (num_investidores == 0) {
+        printf("Nenhum investidor cadastrado.\n");
+        return;
+    }
+    //atualizar o patrimonio
+
+    for(int i = 0; i < num_investidores; i++){
+        lista[i].patrimonio = somarPatrimonio(lista[i].id);
+    }
+
+    printf("Lista de Investidores:\n");
+    printf("----------------------\n");
+    //bubble sort
+    for (int i = 0; i < num_investidores; i++) {
+        for (int j = 0; j < num_investidores - 1; j++) {
+            if (lista[j].patrimonio > lista[j + 1].patrimonio) {
+                investidor aux = lista[j];
+                lista[j] = lista[j + 1];
+                lista[j + 1] = aux;
+            }
+        }
+    }
+
+
+    
+    for (int i = 0; i < num_investidores; i++) {
+        printf("ID: %d\n", lista[i].id);
+        printf("Nome: %s\n", lista[i].nome);
+        printf("Data de Nascimento: %d/%d/%d\n", lista[i].data.dia, lista[i].data.mes, lista[i].data.ano);
+        printf("CPF: %s\n", lista[i].cpf);
+        printf("Endereço: %s\n", lista[i].endereco);
+        printf("Salário: R$ %.2f\n", lista[i].salario);
+        printf("Patrimônio: R$ %.2f\n", lista[i].patrimonio);
+        printf("----------------------\n----------------------\n");
+    }
+
 }
 
 
@@ -340,7 +381,7 @@ void opcao() {
         int funcao1 = 0;
 
         printf("As funções abaixo estão enumeradas da seguinte maneira:\n\n\n");
-        printf("0 - Sair\n1 - Inserir investidor\n2 - Listar Investidores:\n3 - Alterar Investidor\n4 - Remover Investidor\n5 - Listar Investidor Específico\n6 - Ir para a tela de investimentos\n");
+        printf("0 - Sair\n1 - Inserir investidor\n2 - Listar Investidores:\n3 - Alterar Investidor\n4 - Remover Investidor\n5 - Listar Investidor Específico\n6 - Listar em ordem crescente de patrimonio\n7 - Ir para a tela de investimentos\n");
         scanf("%d", &funcao1);
         switch (funcao1) {
             case 0:
@@ -360,7 +401,10 @@ void opcao() {
             case 5:
                 listar_investidor();
                 break;
-            case 6 :
+            case 6:
+                listar_ordem_crecente();
+                break;
+            case 7 :
                 opcao_investimento();
                 break;
     
